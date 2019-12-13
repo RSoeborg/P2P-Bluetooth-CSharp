@@ -46,6 +46,7 @@ namespace ProjectGreenEnvironment
 
             // Create handler and subscribe to events 
             var pairedDevices = new List<BluetoothDeviceInfo>();
+            var connectionClients = new List<BluetoothClient>();
 
             BluetoothHandler bluetooth = new BluetoothHandler("8724");
             bluetooth.DiscoverComplete += (s, e) => {
@@ -55,7 +56,14 @@ namespace ProjectGreenEnvironment
                 MessageBox.Show($"{pairedDevices.Count} device(s) has been paired.");
             };
 
+            bluetooth.RecievedData += (s, e) => 
+            {
+                var data = (BluetoothData)s;
+                MessageBox.Show(data.Content);
+            };
+
             bluetooth.ConnectedTo += (s, e) => {
+                connectionClients.Add((BluetoothClient)s);
                 MessageBox.Show("Du har forbundet til en device.");
             };
 
@@ -68,8 +76,11 @@ namespace ProjectGreenEnvironment
                 MessageBox.Show($"Jeg lytter nu til {device.RemoteMachineName}");
             };
 
+
+
             // Listen to events.
             bluetooth.StartListener();
+            
             
             // Wait for callbacks
             bool justPressedAKey = false;
@@ -102,6 +113,22 @@ namespace ProjectGreenEnvironment
                     }
                     justPressedAKey = true;
                 }
+
+                else if (GetAsyncKeyState(0x7A))
+                {
+                    if (!justPressedAKey)
+                    {
+                        // Broadcast a sample message
+                        foreach (var client in connectionClients)
+                        {
+                            bluetooth.SendData("Hej fra mig", client);
+                        }
+                    }
+
+
+                    justPressedAKey = true;
+                }
+
 
                 else justPressedAKey = false;
             }   

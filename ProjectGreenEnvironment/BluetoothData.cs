@@ -9,7 +9,7 @@ namespace ProjectGreenEnvironment
 {
     class BluetoothData
     {
-        public string Contents { get; set; }
+        public string Content { get; set; }
         public BluetoothClient Sender { get; set; }
     }
 }

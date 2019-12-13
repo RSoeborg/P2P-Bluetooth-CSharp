@@ -22,7 +22,7 @@ namespace ProjectGreenEnvironment
             BluetoothEndPoint localEndpoint = new BluetoothEndPoint(BluetoothAddress.Parse(GetBTMacAddress().ToString()), BluetoothService.SerialPort);
             localClient = new BluetoothClient(localEndpoint);
         }
-
+        
         private List<BluetoothDeviceInfo> deviceList = new List<BluetoothDeviceInfo>();
         private BluetoothClient localClient;
         
@@ -49,7 +49,7 @@ namespace ProjectGreenEnvironment
         {
             if (result.IsCompleted)
             {
-                ConnectedTo.Invoke(null, EventArgs.Empty);
+                ConnectedTo.Invoke(result, EventArgs.Empty);
             }
         }
         private void AcceptConnection(IAsyncResult result)
@@ -71,7 +71,7 @@ namespace ProjectGreenEnvironment
                     {
                         var data = new BluetoothData()
                         {
-                            Contents = sr.ReadToEnd(),
+                            Content = sr.ReadToEnd(),
                             Sender = client
                         };
 
@@ -82,7 +82,6 @@ namespace ProjectGreenEnvironment
                 System.Threading.Thread.Sleep(delay);
             }
         }
-
         public void SendData(string Content, BluetoothClient client)
         {
             using (var sw = new StreamWriter(client.GetStream()))
@@ -91,7 +90,6 @@ namespace ProjectGreenEnvironment
                 sw.Flush();
             }
         }
-
 
         public void BeginDiscoveringDevices()
         {
@@ -152,7 +150,7 @@ namespace ProjectGreenEnvironment
             BluetoothEndPoint localEndpoint = new BluetoothEndPoint(BluetoothAddress.Parse(GetBTMacAddress().ToString()), BluetoothService.SerialPort);
             var c = new BluetoothClient(localEndpoint);
             c.SetPin(overridePin == string.Empty ? Device_Pin : overridePin);
-            c.BeginConnect(device.DeviceAddress, BluetoothService.SerialPort, new AsyncCallback(Connect), device);
+            c.BeginConnect(device.DeviceAddress, BluetoothService.SerialPort, new AsyncCallback(Connect), c);
         }
 
         private BluetoothAddress GetBluetoothAddress()
