@@ -66,9 +66,9 @@ namespace ProjectGreenEnvironment
         
         public void StartListeningTo(BluetoothClient client, int delay=50)
         {
+            StringBuilder builder = new StringBuilder();
             while (client.Connected)
             {
-                StringBuilder builder = new StringBuilder();
                 if (client.Available > 0)
                 {
                     byte[] buffer = new byte[client.Available];
@@ -86,6 +86,7 @@ namespace ProjectGreenEnvironment
                         Sender = client
                     };
                     RecievedData?.Invoke(data, EventArgs.Empty);
+                    builder.Clear();
                 }
                 
                 System.Threading.Thread.Sleep(delay);
