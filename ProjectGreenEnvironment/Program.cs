@@ -159,7 +159,11 @@ namespace ProjectGreenEnvironment
                         {
                             if (!pairedDevice.Connected)
                             {
+                                MessageBox.Show($"Forsøger at forbinde til : {pairedDevice.DeviceName}");
                                 bluetooth.BeginConnect(pairedDevice);
+                            } else
+                            {
+                                MessageBox.Show($"{pairedDevice.DeviceName} er allerede forbundet.");
                             }
                         }
                     }
