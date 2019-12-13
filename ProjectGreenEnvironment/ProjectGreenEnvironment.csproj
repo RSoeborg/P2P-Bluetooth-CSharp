@@ -63,6 +63,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BluetoothData.cs" />
     <Compile Include="BluetoothHandler.cs" />
     <Compile Include="FrmSetup.cs">
       <SubType>Form</SubType>

@@ -55,11 +55,16 @@ namespace ProjectGreenEnvironment
             };
 
             bluetooth.ConnectedTo += (s, e) => {
-                MessageBox.Show("Du har forbundet til en.");
+                MessageBox.Show("Du har forbundet til en device.");
             };
 
             bluetooth.AcceptedConnection += (s, e) => {
-                MessageBox.Show("Der er en der har forbundet til dig.");
+                var device = (BluetoothClient)s;
+                new Thread(() => 
+                {
+                    bluetooth.StartListeningTo(device);
+                }).Start();
+                MessageBox.Show($"Jeg lytter nu til {device.RemoteMachineName}");
             };
 
             // Listen to events.

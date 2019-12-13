@@ -3,6 +3,7 @@ using InTheHand.Net.Bluetooth;
 using InTheHand.Net.Sockets;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Text;
@@ -29,6 +30,8 @@ namespace ProjectGreenEnvironment
         public event EventHandler AcceptedConnection;
         public event EventHandler ConnectedTo;
 
+        public event EventHandler RecievedData;
+        
         private void component_DiscoverDevicesProgress(object sender, DiscoverDevicesEventArgs e)
         {
             // log and save all found devices
@@ -55,6 +58,37 @@ namespace ProjectGreenEnvironment
             {
                 BluetoothClient remoteDevice = ((BluetoothListener)result.AsyncState).EndAcceptBluetoothClient(result);
                 AcceptedConnection.Invoke(remoteDevice, EventArgs.Empty);
+            }
+        }
+        
+        public void StartListeningTo(BluetoothClient client, int delay=50)
+        {
+            while (client.Connected)
+            {
+                if (client.Available > 0)
+                {
+                    using (var sr = new StreamReader(client.GetStream()))
+                    {
+                        var data = new BluetoothData()
+                        {
+                            Contents = sr.ReadToEnd(),
+                            Sender = client
+                        };
+
+                        RecievedData?.Invoke(data, EventArgs.Empty);
+                    }
+                }
+                
+                System.Threading.Thread.Sleep(delay);
+            }
+        }
+
+        public void SendData(string Content, BluetoothClient client)
+        {
+            using (var sw = new StreamWriter(client.GetStream()))
+            {
+                sw.Write(Content);
+                sw.Flush();
             }
         }
 
