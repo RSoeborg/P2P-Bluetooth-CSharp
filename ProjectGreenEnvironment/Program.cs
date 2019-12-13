@@ -68,6 +68,8 @@ namespace ProjectGreenEnvironment
                     }
                 }
             }
+
+            MessageBox.Show("All devices has been paired!");
         }
 
         private static void Connect(IAsyncResult result)
@@ -122,32 +124,44 @@ namespace ProjectGreenEnvironment
 
 
             // Wait for callbacks
+            bool justPressedAKey = false;
+
             while (true)
             {
                 if (GetAsyncKeyState(0x78)) // F9 for at parre sig.
                 {
-                    BluetoothEndPoint localEndpoint = new BluetoothEndPoint(BluetoothAddress.Parse(GetBTMacAddress().ToString()), BluetoothService.SerialPort);
-                    localClient = new BluetoothClient(localEndpoint);
-                    BluetoothComponent localComponent = new BluetoothComponent(localClient);
-                    localComponent.DiscoverDevicesAsync(255, true, true, true, true, null);
-                    localComponent.DiscoverDevicesProgress += new EventHandler<DiscoverDevicesEventArgs>(component_DiscoverDevicesProgress);
-                    localComponent.DiscoverDevicesComplete += new EventHandler<DiscoverDevicesEventArgs>(component_DiscoverDevicesComplete);
+                    if (!justPressedAKey)
+                    {
+                        BluetoothEndPoint localEndpoint = new BluetoothEndPoint(BluetoothAddress.Parse(GetBTMacAddress().ToString()), BluetoothService.SerialPort);
+                        localClient = new BluetoothClient(localEndpoint);
+                        BluetoothComponent localComponent = new BluetoothComponent(localClient);
+                        localComponent.DiscoverDevicesAsync(255, true, true, true, true, null);
+                        localComponent.DiscoverDevicesProgress += new EventHandler<DiscoverDevicesEventArgs>(component_DiscoverDevicesProgress);
+                        localComponent.DiscoverDevicesComplete += new EventHandler<DiscoverDevicesEventArgs>(component_DiscoverDevicesComplete);
+                    }
+
+                    justPressedAKey = true;
                 }
 
-                if (GetAsyncKeyState(0x79)) // F10 for at forbinde sig til at devices.
+                else if (GetAsyncKeyState(0x79)) // F10 for at forbinde sig til at devices.
                 {
-                    foreach (var device in deviceList)
+                    if (!justPressedAKey)
                     {
-                        if (device.Authenticated)
+                        foreach (var device in deviceList)
                         {
-                            localClient.SetPin("1234");
-                            localClient.BeginConnect(device.DeviceAddress, BluetoothService.SerialPort, new AsyncCallback(Connect), device);
+                            if (device.Authenticated)
+                            {
+                                BluetoothEndPoint localEndpoint = new BluetoothEndPoint(BluetoothAddress.Parse(GetBTMacAddress().ToString()), BluetoothService.SerialPort);
+                                var c = new BluetoothClient(localEndpoint);
+                                c.SetPin("1234");
+                                c.BeginConnect(device.DeviceAddress, BluetoothService.SerialPort, new AsyncCallback(Connect), device);
+                            }
                         }
                     }
+                    justPressedAKey = true;
                 }
 
-
-
+                else justPressedAKey = false;
             }   
         }
 
