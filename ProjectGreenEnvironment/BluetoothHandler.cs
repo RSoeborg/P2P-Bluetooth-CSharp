@@ -70,16 +70,16 @@ namespace ProjectGreenEnvironment
             {
                 if (client.Available > 0)
                 {
-                    using (var sr = new StreamReader(client.GetStream()))
+                    byte[] buffer = new byte[client.Available];
+                    client.GetStream().Read(buffer, 0, buffer.Length);
+                    
+                    var data = new BluetoothData()
                     {
-                        var data = new BluetoothData()
-                        {
-                            Content = sr.ReadToEnd(),
-                            Sender = client
-                        };
+                        Content = Encoding.UTF8.GetString(buffer),
+                        Sender = client
+                    };
 
-                        RecievedData?.Invoke(data, EventArgs.Empty);
-                    }
+                    RecievedData?.Invoke(data, EventArgs.Empty); 
                 }
                 
                 System.Threading.Thread.Sleep(delay);
@@ -87,11 +87,11 @@ namespace ProjectGreenEnvironment
         }
         public void SendData(string Content, BluetoothClient client)
         {
-            using (var sw = new StreamWriter(client.GetStream()))
-            {
-                sw.Write(Content);
-                sw.Flush();
-            }
+            var stream = client.GetStream();
+            byte[] buffer = Encoding.UTF8.GetBytes(Content);
+            
+            stream.Write(buffer, 0, buffer.Length);
+            stream.Flush(); 
         }
 
         public void BeginDiscoveringDevices()
