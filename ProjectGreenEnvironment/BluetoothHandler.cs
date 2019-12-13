@@ -78,7 +78,7 @@ namespace ProjectGreenEnvironment
                     builder.Append(recieved_data_buffer);
                 }
 
-                if (builder.ToString().EndsWith("$END"))
+                if (builder.ToString().Replace("\0", string.Empty).EndsWith("$END"))
                 {
                     var data = new BluetoothData()
                     {
