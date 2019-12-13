@@ -95,9 +95,30 @@ namespace ProjectGreenEnvironment
         {
             var stream = client.GetStream();
             byte[] buffer = Encoding.UTF8.GetBytes(Content);
-            
-            stream.Write(buffer, 0, buffer.Length);
-            stream.Flush(); 
+
+            List<byte[]> chunks = new List<byte[]>();
+
+            byte[] currentChunk = new byte[1024];
+            int chunkIndex = 0;
+
+            for (int i = 0; i < buffer.Length; i++)
+            {
+                currentChunk[chunkIndex++] = buffer[i];
+                
+                if (chunkIndex >= 1024)
+                {
+                    chunks.Add(currentChunk);
+                    chunkIndex = 0;
+                    currentChunk = new byte[1024];
+                }
+            }
+
+            foreach (var chunk in chunks)
+            {
+                stream.Write(chunk, 0, chunk.Length);
+                stream.Flush();
+                System.Threading.Thread.Sleep(1000);
+            }
         }
 
         public void BeginDiscoveringDevices()
