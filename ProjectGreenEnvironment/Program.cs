@@ -63,7 +63,7 @@ namespace ProjectGreenEnvironment
             };
 
             bluetooth.ConnectedTo += (s, e) => {
-                connectionClients.Add((BluetoothClient)s);
+                connectionClients.Add((BluetoothClient)((IAsyncResult)s).AsyncState);
                 MessageBox.Show("Du har forbundet til en device.");
             };
 
