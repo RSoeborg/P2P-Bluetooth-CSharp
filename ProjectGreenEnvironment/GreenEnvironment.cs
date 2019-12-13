@@ -17,9 +17,6 @@ namespace ProjectGreenEnvironment
     class GreenEnvironment
     {
         public string PeerName { get; private set; }
-
-        private readonly Guid OurServiceClassId = new Guid("{E075D486-E23D-4887-8AF5-DAA1F6A5B172}");
-        private readonly string OurServiceName = "GreenEnv";
         
         public string GetFolderPath()
         {
@@ -50,80 +47,30 @@ namespace ProjectGreenEnvironment
         {
             return Path.Combine(GetFolderPath(), file);
         }
-
-
-        BluetoothClient client;
-        public void CreateClient()
-        {
-            client = new BluetoothClient();
-        }
         
-        public BluetoothDeviceInfo[] FindPairedDevices()
-        { 
-            return client.DiscoverDevices();
-        }
-
-        private List<BluetoothClient> connected = new List<BluetoothClient>();
-        private List<BluetoothClient> listening = new List<BluetoothClient>();
-
-        public void ConnectTo(BluetoothAddress address) {
-            client.Connect(address, OurServiceClassId);
-            connected.Add(client);
-        }
-        
- 
-        public void StartListening()
+        public void SaveFileData(string Data)
         {
-            var listener = new BluetoothListener(OurServiceClassId);
-            listener.Start();
+            var SenderName = Data.Split(' ').First();
+            Data = Data.Substring(SenderName.Length + 1, Data.Length - (SenderName.Length + 1));
 
-            var listenThread = new Thread(() => {
-                while (true)
-                {
-                    if (listener.Pending())
-                    {
-                        MessageBox.Show("Rasmus har forbundet til dig");
-                        listening.Add(listener.AcceptBluetoothClient());
-                    }
-                    Thread.Sleep(50);
-                }
-            });
-            listenThread.Start();
-
-
-            var getMessages = new Thread(() => {
-                while (true)
-                {
-                    foreach (var device in listening)
-                    {
-                        if (device.Available > 0)
-                        {
-                            using (var sr = new StreamReader(device.GetStream()))
-                            {
-                                MessageBox.Show(sr.ReadToEnd());
-                            }
-
-
-                        }
-                    }
-                    Thread.Sleep(50);
-                }
-            });
-        }
-
-        public void Broadcast(string message)
-        {
-            foreach (var device in connected)
+            using (var sw = new StreamWriter(TranslateFile($"{SenderName}.txt")))
             {
-                using (var sw = new StreamWriter(device.GetStream()))
-                {
-                    sw.Write(message);
-                }
-                
-            }
+                sw.Write(Data);
+            }      
         }
-        
 
-        
+
+        public string MyFile()
+        {
+            // Read my file
+            string Content = string.Empty;
+            using (var sr = new StreamReader(TranslateFile($"{PeerName}.txt")))
+            {
+                Content = sr.ReadToEnd();
+            }
+
+            // Construct file
+            return $"{PeerName} {Content}"; 
+        }
     }
 }

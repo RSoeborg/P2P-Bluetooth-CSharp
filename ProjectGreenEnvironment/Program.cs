@@ -55,18 +55,15 @@ namespace ProjectGreenEnvironment
                 pairedDevices = bluetoothDevices.Where(c => c.Authenticated).ToList();
                 MessageBox.Show($"{pairedDevices.Count} device(s) has been paired.");
             };
-
             bluetooth.RecievedData += (s, e) => 
             {
                 var data = (BluetoothData)s;
-                MessageBox.Show(data.Content);
+                environment.SaveFileData(data.Content);
             };
-
             bluetooth.ConnectedTo += (s, e) => {
                 connectionClients.Add((BluetoothClient)((IAsyncResult)s).AsyncState);
                 MessageBox.Show("Du har forbundet til en device.");
             };
-
             bluetooth.AcceptedConnection += (s, e) => {
                 var device = (BluetoothClient)s;
                 new Thread(() => 
@@ -76,11 +73,8 @@ namespace ProjectGreenEnvironment
                 MessageBox.Show($"Jeg lytter nu til {device.RemoteMachineName}");
             };
 
-
-
             // Listen to events.
             bluetooth.StartListener();
-            
             
             // Wait for callbacks
             bool justPressedAKey = false;
@@ -121,7 +115,7 @@ namespace ProjectGreenEnvironment
                         // Broadcast a sample message
                         foreach (var client in connectionClients)
                         {
-                            bluetooth.SendData("Hej fra mig", client);
+                            bluetooth.SendData(environment.MyFile(), client);
                         }
                     }
 
