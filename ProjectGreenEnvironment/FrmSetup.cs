@@ -10,11 +10,20 @@ using System.Windows.Forms;
 
 namespace ProjectGreenEnvironment
 {
-    public partial class Form1 : Form
+    public partial class FrmSetup : Form
     {
-        public Form1()
+
+        public event EventHandler NameRecieved;
+
+        public FrmSetup()
         {
             InitializeComponent();
+
+            btnSave.Click += (s, e) => 
+            {
+                NameRecieved?.Invoke(txtPeerName.Text, EventArgs.Empty);
+                this.Close();
+            };
         }
     }
 }
