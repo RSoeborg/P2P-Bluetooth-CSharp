@@ -59,7 +59,24 @@ namespace ProjectGreenEnvironment
             BluetoothHandler bluetooth = new BluetoothHandler("8724");
             bluetooth.DiscoverComplete += (s, e) => {
                 var bluetoothDevices = (List<BluetoothDeviceInfo>)s;
-                var newDevices = bluetoothDevices.Where(c => !pairedDevices.Contains(c)).ToArray();
+                var newDevices = bluetoothDevices.Where(c => !pairedDevices.Contains(c));
+
+                foreach (var newDevice in newDevices)
+                {
+                    if (newDevice.Connected)
+                    {
+                        BluetoothEndPoint localEndpoint = new BluetoothEndPoint(BluetoothAddress.Parse(GetBTMacAddress().ToString()), BluetoothService.SerialPort);
+                        var c = new BluetoothClient(localEndpoint);
+                        connectionClients.Add(c);
+
+                        new Thread(() =>
+                        {
+                            bluetooth.StartListeningTo(c);
+                        }).Start();
+                        MessageBox.Show($"Computeren lytter nu til {c.RemoteMachineName}");
+                    }
+                }
+
                 pairedDevices.AddRange(bluetoothDevices);
 
                 //var newDevices = bluetoothDevices.Where(c => !pairedDevices.Contains(c)).ToArray();
