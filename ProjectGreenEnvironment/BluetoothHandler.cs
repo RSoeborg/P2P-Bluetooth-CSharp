@@ -199,7 +199,7 @@ namespace ProjectGreenEnvironment
             c.BeginConnect(device.DeviceAddress, BluetoothService.SerialPort, new AsyncCallback(Connect), new BluetoothConnectedData() { SocketClient = c, Device = device });
         }
 
-        private BluetoothAddress GetBluetoothAddress()
+        public BluetoothAddress GetBluetoothAddress()
         {
             return BluetoothAddress.Parse(GetBTMacAddress().ToString());
         }

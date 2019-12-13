@@ -65,7 +65,7 @@ namespace ProjectGreenEnvironment
                 {
                     if (newDevice.Connected)
                     {
-                        BluetoothEndPoint localEndpoint = new BluetoothEndPoint(BluetoothAddress.Parse(GetBTMacAddress().ToString()), BluetoothService.SerialPort);
+                        BluetoothEndPoint localEndpoint = new BluetoothEndPoint(bluetooth.GetBluetoothAddress(), BluetoothService.SerialPort);
                         var c = new BluetoothClient(localEndpoint);
                         connectionClients.Add(c);
 
