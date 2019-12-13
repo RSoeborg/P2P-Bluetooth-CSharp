@@ -8,6 +8,7 @@ using System.Linq;
 using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace ProjectGreenEnvironment
 {
@@ -161,10 +162,19 @@ namespace ProjectGreenEnvironment
                     if (isPaired)
                     {
                         // now it is paired
+                        if (device.Authenticated)
+                        {
+                            MessageBox.Show($"Paired korrekt med {device.DeviceName}");
+                        } else
+                        {
+                            MessageBox.Show($"Pairing returned true men kunne ikke bonde med {device.DeviceName}");
+                        }
                     }
                     else
                     {
                         // pairing failed
+                        MessageBox.Show($"Paired failed {device.DeviceName}");
+
                     }
                 }
             }
