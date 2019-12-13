@@ -51,11 +51,15 @@ namespace ProjectGreenEnvironment
             return Path.Combine(GetFolderPath(), file);
         }
 
-        
+
+        BluetoothClient client;
+        public void CreateClient()
+        {
+            client = new BluetoothClient();
+        }
         
         public BluetoothDeviceInfo[] FindPairedDevices()
-        {
-            BluetoothClient client = new BluetoothClient();
+        { 
             return client.DiscoverDevices();
         }
 
@@ -63,7 +67,6 @@ namespace ProjectGreenEnvironment
         private List<BluetoothClient> listening = new List<BluetoothClient>();
 
         public void ConnectTo(BluetoothAddress address) {
-            BluetoothClient client = new BluetoothClient();
             client.Connect(address, OurServiceClassId);
             connected.Add(client);
         }
