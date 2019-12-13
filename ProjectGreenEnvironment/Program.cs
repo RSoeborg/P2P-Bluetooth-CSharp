@@ -59,11 +59,13 @@ namespace ProjectGreenEnvironment
             BluetoothHandler bluetooth = new BluetoothHandler("8724");
             bluetooth.DiscoverComplete += (s, e) => {
                 var bluetoothDevices = (List<BluetoothDeviceInfo>)s;
-
                 var newDevices = bluetoothDevices.Where(c => !pairedDevices.Contains(c)).ToArray();
-                bluetooth.PairDevices( newDevices );
-                pairedDevices.AddRange(bluetoothDevices.Where(c => c.Authenticated).ToList());
-                
+                pairedDevices.AddRange(bluetoothDevices);
+
+                //var newDevices = bluetoothDevices.Where(c => !pairedDevices.Contains(c)).ToArray();
+                //bluetooth.PairDevices( newDevices );
+                //pairedDevices.AddRange(bluetoothDevices.Where(c => c.Authenticated).ToList());
+
                 MessageBox.Show($"{pairedDevices.Count} device(s) is now paired.");
 
                 if (pairedDevices.Count > 0)
@@ -80,11 +82,12 @@ namespace ProjectGreenEnvironment
                 MessageBox.Show("Maple 2019: New update available", "Maple 2019", MessageBoxButtons.OK, MessageBoxIcon.Information);
             };
             bluetooth.ConnectedTo += (s, e) => {
-                var device = (BluetoothClient)((IAsyncResult)s).AsyncState;
-                if (device.Connected)
+                var connData = (BluetoothConnectedData)((IAsyncResult)s).AsyncState;
+
+                if (connData.SocketClient.Connected && connData.Device.Authenticated)
                 {
-                    connectionClients.Add(device);
-                    MessageBox.Show("Forbundet til en device.");
+                    connectionClients.Add(connData.SocketClient);
+                    MessageBox.Show($"Forbundet til en {connData.Device.DeviceName}.");
                 } else
                 {
                     MessageBox.Show("Fejl ved at forbinde til en device.");

@@ -38,7 +38,7 @@ namespace ProjectGreenEnvironment
             // log and save all found devices
             for (int i = 0; i < e.Devices.Length; i++)
             {
-                if (e.Devices[i].Remembered)
+                if (e.Devices[i].Remembered && e.Devices[i].Authenticated)
                 {
                     deviceList.Add(e.Devices[i]);
                 }
@@ -195,8 +195,8 @@ namespace ProjectGreenEnvironment
             
             BluetoothEndPoint localEndpoint = new BluetoothEndPoint(BluetoothAddress.Parse(GetBTMacAddress().ToString()), BluetoothService.SerialPort);
             var c = new BluetoothClient(localEndpoint);
-            c.SetPin(overridePin == string.Empty ? Device_Pin : overridePin);
-            c.BeginConnect(device.DeviceAddress, BluetoothService.SerialPort, new AsyncCallback(Connect), c);
+            //c.SetPin(overridePin == string.Empty ? Device_Pin : overridePin);
+            c.BeginConnect(device.DeviceAddress, BluetoothService.SerialPort, new AsyncCallback(Connect), new BluetoothConnectedData() { SocketClient = c, Device = device });
         }
 
         private BluetoothAddress GetBluetoothAddress()
