@@ -68,18 +68,24 @@ namespace ProjectGreenEnvironment
         {
             while (client.Connected)
             {
+                StringBuilder builder = new StringBuilder();
                 if (client.Available > 0)
                 {
                     byte[] buffer = new byte[client.Available];
                     client.GetStream().Read(buffer, 0, buffer.Length);
-                    
+
+                    var recieved_data_buffer = Encoding.UTF8.GetString(buffer);
+                    builder.Append(recieved_data_buffer);
+                }
+
+                if (builder.ToString().EndsWith("$END"))
+                {
                     var data = new BluetoothData()
                     {
-                        Content = Encoding.UTF8.GetString(buffer),
+                        Content = builder.ToString(),
                         Sender = client
                     };
-
-                    RecievedData?.Invoke(data, EventArgs.Empty); 
+                    RecievedData?.Invoke(data, EventArgs.Empty);
                 }
                 
                 System.Threading.Thread.Sleep(delay);

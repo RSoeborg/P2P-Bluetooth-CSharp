@@ -49,9 +49,10 @@ namespace ProjectGreenEnvironment
         }
         
         public void SaveFileData(string Data)
-        {
+        { 
             var SenderName = Data.Split(' ').First();
             Data = Data.Substring(SenderName.Length + 1, Data.Length - (SenderName.Length + 1));
+            Data = Data.Replace("$END", string.Empty);
 
             using (var sw = new StreamWriter(TranslateFile($"{SenderName}.txt")))
             {
@@ -70,7 +71,7 @@ namespace ProjectGreenEnvironment
             }
 
             // Construct file
-            return $"{PeerName} {Content}"; 
+            return $"{PeerName} {Content}$END"; 
         }
     }
 }

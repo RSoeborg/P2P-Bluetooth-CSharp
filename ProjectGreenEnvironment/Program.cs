@@ -44,6 +44,8 @@ namespace ProjectGreenEnvironment
                 environment.Setup(PeerName);
             }
 
+            environment.Load();
+
             // Create handler and subscribe to events 
             var pairedDevices = new List<BluetoothDeviceInfo>();
             var connectionClients = new List<BluetoothClient>();
