@@ -114,6 +114,11 @@ namespace ProjectGreenEnvironment
                 }
             }
 
+            if (chunkIndex != 0)//part of a chunk (ending chunk)
+            {
+                chunks.Add(currentChunk);
+            }
+
             foreach (var chunk in chunks)
             {
                 stream.Write(chunk, 0, chunk.Length);
