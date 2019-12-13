@@ -77,7 +77,7 @@ namespace ProjectGreenEnvironment
                     }
                 }
 
-                pairedDevices.AddRange(bluetoothDevices);
+                pairedDevices.AddRange(newDevices);
 
                 //var newDevices = bluetoothDevices.Where(c => !pairedDevices.Contains(c)).ToArray();
                 //bluetooth.PairDevices( newDevices );
