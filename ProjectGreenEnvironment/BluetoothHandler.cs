@@ -46,6 +46,15 @@ namespace ProjectGreenEnvironment
         }
         private void component_DiscoverDevicesComplete(object sender, DiscoverDevicesEventArgs e)
         {
+            foreach (var device in deviceList)
+            {
+                if (device.Connected)
+                {
+                    BeginConnect(device);
+                }
+            }
+
+
             DiscoverComplete?.Invoke(deviceList, EventArgs.Empty);
         }
 
