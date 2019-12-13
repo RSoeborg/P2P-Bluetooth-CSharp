@@ -37,7 +37,10 @@ namespace ProjectGreenEnvironment
             // log and save all found devices
             for (int i = 0; i < e.Devices.Length; i++)
             {
-                deviceList.Add(e.Devices[i]);
+                if (e.Devices[i].Remembered)
+                {
+                    deviceList.Add(e.Devices[i]);
+                }
             }
         }
         private void component_DiscoverDevicesComplete(object sender, DiscoverDevicesEventArgs e)
