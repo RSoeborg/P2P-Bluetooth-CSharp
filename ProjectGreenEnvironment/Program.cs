@@ -59,9 +59,12 @@ namespace ProjectGreenEnvironment
             BluetoothHandler bluetooth = new BluetoothHandler("8724");
             bluetooth.DiscoverComplete += (s, e) => {
                 var bluetoothDevices = (List<BluetoothDeviceInfo>)s;
-                bluetooth.PairDevices(bluetoothDevices.ToArray());
-                pairedDevices = bluetoothDevices.Where(c => c.Authenticated).ToList();
-                MessageBox.Show($"{pairedDevices.Count} device(s) has been paired.");
+
+                var newDevices = bluetoothDevices.Where(c => !pairedDevices.Contains(c)).ToArray();
+                bluetooth.PairDevices( newDevices );
+                pairedDevices.AddRange(bluetoothDevices.Where(c => c.Authenticated).ToList());
+                
+                MessageBox.Show($"{pairedDevices.Count} device(s) is now paired.");
 
                 if (pairedDevices.Count > 0)
                 {
@@ -134,7 +137,10 @@ namespace ProjectGreenEnvironment
 
                         foreach (var pairedDevice in pairedDevices)
                         {
-                            bluetooth.BeginConnect(pairedDevice);
+                            if (!pairedDevice.Connected)
+                            {
+                                bluetooth.BeginConnect(pairedDevice);
+                            }
                         }
                     }
                     justPressedAKey = true;

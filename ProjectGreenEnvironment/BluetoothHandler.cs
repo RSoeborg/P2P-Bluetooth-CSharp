@@ -131,14 +131,14 @@ namespace ProjectGreenEnvironment
         {
             deviceList.Clear();
             BluetoothComponent localComponent = new BluetoothComponent(localClient);
-            localComponent.DiscoverDevicesAsync(255, true, true, true, true, null);
+            localComponent.DiscoverDevicesAsync(10, true, true, false, true, null);
             localComponent.DiscoverDevicesProgress += new EventHandler<DiscoverDevicesEventArgs>(component_DiscoverDevicesProgress);
             localComponent.DiscoverDevicesComplete += new EventHandler<DiscoverDevicesEventArgs>(component_DiscoverDevicesComplete);
         }
         public void PairDevices(BluetoothDeviceInfo[] devicesToPair)
         {
             // get a list of all paired devices
-            BluetoothDeviceInfo[] paired = localClient.DiscoverDevices(255, false, true, false, false);
+            BluetoothDeviceInfo[] paired = localClient.DiscoverDevices(10, false, true, false, false);
 
             // check every discovered device if it is already paired 
             foreach (BluetoothDeviceInfo device in devicesToPair)
