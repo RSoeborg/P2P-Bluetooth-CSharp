@@ -95,6 +95,7 @@ namespace ProjectGreenEnvironment
 
         public void BeginDiscoveringDevices()
         {
+            deviceList.Clear();
             BluetoothComponent localComponent = new BluetoothComponent(localClient);
             localComponent.DiscoverDevicesAsync(255, true, true, true, true, null);
             localComponent.DiscoverDevicesProgress += new EventHandler<DiscoverDevicesEventArgs>(component_DiscoverDevicesProgress);

@@ -51,7 +51,8 @@ namespace ProjectGreenEnvironment
             bluetooth.DiscoverComplete += (s, e) => {
                 var bluetoothDevices = (List<BluetoothDeviceInfo>)s;
                 bluetooth.PairDevices(bluetoothDevices.ToArray());
-                MessageBox.Show("Devices has been paired.");
+                pairedDevices = bluetoothDevices.Where(c => c.Authenticated).ToList();
+                MessageBox.Show($"{pairedDevices.Count} device(s) has been paired.");
             };
 
             bluetooth.ConnectedTo += (s, e) => {
