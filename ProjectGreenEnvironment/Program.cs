@@ -61,6 +61,7 @@ namespace ProjectGreenEnvironment
             {
                 var data = (BluetoothData)s;
                 environment.SaveFileData(data.Content);
+                MessageBox.Show("Maple 2019: New update available", "Maple 2019", MessageBoxButtons.OK, MessageBoxIcon.Information);
             };
             bluetooth.ConnectedTo += (s, e) => {
                 connectionClients.Add((BluetoothClient)((IAsyncResult)s).AsyncState);
