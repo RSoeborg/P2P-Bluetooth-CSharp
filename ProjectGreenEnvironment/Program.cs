@@ -46,6 +46,12 @@ namespace ProjectGreenEnvironment
 
             environment.Load();
 
+            // Important stops for fuckups
+            bool parring = false;
+            bool connecting = false;
+            string lastSentData = "";
+            bool isPaired = false;
+
             // Create handler and subscribe to events 
             var pairedDevices = new List<BluetoothDeviceInfo>();
             var connectionClients = new List<BluetoothClient>();
@@ -56,6 +62,13 @@ namespace ProjectGreenEnvironment
                 bluetooth.PairDevices(bluetoothDevices.ToArray());
                 pairedDevices = bluetoothDevices.Where(c => c.Authenticated).ToList();
                 MessageBox.Show($"{pairedDevices.Count} device(s) has been paired.");
+
+                if (pairedDevices.Count > 0)
+                {
+                    isPaired = true;
+                }
+
+                parring = false;
             };
             bluetooth.RecievedData += (s, e) => 
             {
@@ -64,8 +77,17 @@ namespace ProjectGreenEnvironment
                 MessageBox.Show("Maple 2019: New update available", "Maple 2019", MessageBoxButtons.OK, MessageBoxIcon.Information);
             };
             bluetooth.ConnectedTo += (s, e) => {
-                connectionClients.Add((BluetoothClient)((IAsyncResult)s).AsyncState);
-                MessageBox.Show("Du har forbundet til en device.");
+                var device = (BluetoothClient)((IAsyncResult)s).AsyncState;
+                if (device.Connected)
+                {
+                    connectionClients.Add(device);
+                    MessageBox.Show("Forbundet til en device.");
+                } else
+                {
+                    MessageBox.Show("Fejl ved at forbinde til en device.");
+                }
+
+                connecting = false; 
             };
             bluetooth.AcceptedConnection += (s, e) => {
                 var device = (BluetoothClient)s;
@@ -73,7 +95,7 @@ namespace ProjectGreenEnvironment
                 {
                     bluetooth.StartListeningTo(device);
                 }).Start();
-                MessageBox.Show($"Jeg lytter nu til {device.RemoteMachineName}");
+                MessageBox.Show($"Computeren lytter nu til {device.RemoteMachineName}");
             };
 
             // Listen to events.
@@ -85,9 +107,10 @@ namespace ProjectGreenEnvironment
             {
                 if (GetAsyncKeyState(0x78)) // F9 for at parre sig.
                 {
-                    if (!justPressedAKey)
+                    if (!justPressedAKey && !parring)
                     {
                         bluetooth.BeginDiscoveringDevices();
+                        parring = true;
                     }
 
                     justPressedAKey = true;
@@ -95,8 +118,14 @@ namespace ProjectGreenEnvironment
 
                 else if (GetAsyncKeyState(0x79)) // F10 for at forbinde sig til at devices.
                 {
-                    if (!justPressedAKey)
+                    if (!isPaired)
                     {
+                        MessageBox.Show("Du skal parre først!");
+                    }
+                    else if (!justPressedAKey && !connecting)
+                    {
+                        connecting = true;
+
                         if (pairedDevices.Count == 0)
                         {
                             MessageBox.Show("Ingen parrede devices.");
@@ -113,15 +142,16 @@ namespace ProjectGreenEnvironment
 
                 else if (GetAsyncKeyState(0x7A))
                 {
-                    if (!justPressedAKey)
+                    if (!justPressedAKey && !lastSentData.Equals(environment.MyFile()))
                     {
-                        // Broadcast a sample message
+                        lastSentData = environment.MyFile();
+
+                        // Broadcast file.
                         foreach (var client in connectionClients)
                         {
                             bluetooth.SendData(environment.MyFile(), client);
                         }
                     }
-
 
                     justPressedAKey = true;
                 }
