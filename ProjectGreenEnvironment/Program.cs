@@ -32,7 +32,6 @@ namespace ProjectGreenEnvironment
                 deviceList.Add(e.Devices[i]);
             }
         }
-
         private static void component_DiscoverDevicesComplete(object sender, DiscoverDevicesEventArgs e)
         {
             // get a list of all paired devices
@@ -68,14 +67,6 @@ namespace ProjectGreenEnvironment
                         // pairing failed
                     }
                 }
-
-                if (device.Authenticated)
-                {
-                    // set pin of device to connect with
-                    localClient.SetPin("1234");
-                    // async connection method
-                    localClient.BeginConnect(device.DeviceAddress, BluetoothService.SerialPort, new AsyncCallback(Connect), device);
-                }
             }
         }
 
@@ -85,6 +76,15 @@ namespace ProjectGreenEnvironment
             {
                 // client is connected now :)
                 MessageBox.Show("Forbundet");
+            }
+        }
+
+        private static void AcceptConnection(IAsyncResult result)
+        {
+            if (result.IsCompleted)
+            {
+                BluetoothClient remoteDevice = ((BluetoothListener)result.AsyncState).EndAcceptBluetoothClient(result);
+                MessageBox.Show("En lort har forbundet til dig");
             }
         }
 
@@ -113,47 +113,42 @@ namespace ProjectGreenEnvironment
             }
 
 
-            // mac is mac address of local bluetooth device
-            BluetoothEndPoint localEndpoint = new BluetoothEndPoint(BluetoothAddress.Parse(GetBTMacAddress().ToString()), BluetoothService.SerialPort);
-            // client is used to manage connections
-            localClient = new BluetoothClient(localEndpoint);
-            // component is used to manage device discovery
-            BluetoothComponent localComponent = new BluetoothComponent(localClient);
-            // async methods, can be done synchronously too
-            localComponent.DiscoverDevicesAsync(255, true, true, true, true, null);
-            localComponent.DiscoverDevicesProgress += new EventHandler<DiscoverDevicesEventArgs>(component_DiscoverDevicesProgress);
-            localComponent.DiscoverDevicesComplete += new EventHandler<DiscoverDevicesEventArgs>(component_DiscoverDevicesComplete);
+            // Create listener
+            var localBtAddr = BluetoothAddress.Parse(GetBTMacAddress().ToString());
+            BluetoothListener listener = new BluetoothListener(localBtAddr, BluetoothService.SerialPort);
+            listener.SetPin(localBtAddr, "1234");
+            listener.Start(10);
+            listener.BeginAcceptBluetoothClient(new AsyncCallback(AcceptConnection), listener);
 
-
-
-
-
-
-            // Init bluetooth listener
-            //environment.StartListening();
-
-
-            //new System.Threading.Thread(() => {
-            //    System.Threading.Thread.Sleep(5000);
-            //    System.Diagnostics.Debugger.Break();
-
-            //    environment.Broadcast("Hej Hans");
-            //}).Start();
-
-
-            //environment.FindPairedDevices();
 
             // Wait for callbacks
             while (true)
             {
-                if (GetAsyncKeyState(0x78))
+                if (GetAsyncKeyState(0x78)) // F9 for at parre sig.
                 {
-                    //TODO: Send file
+                    BluetoothEndPoint localEndpoint = new BluetoothEndPoint(BluetoothAddress.Parse(GetBTMacAddress().ToString()), BluetoothService.SerialPort);
+                    localClient = new BluetoothClient(localEndpoint);
+                    BluetoothComponent localComponent = new BluetoothComponent(localClient);
+                    localComponent.DiscoverDevicesAsync(255, true, true, true, true, null);
+                    localComponent.DiscoverDevicesProgress += new EventHandler<DiscoverDevicesEventArgs>(component_DiscoverDevicesProgress);
+                    localComponent.DiscoverDevicesComplete += new EventHandler<DiscoverDevicesEventArgs>(component_DiscoverDevicesComplete);
                 }
-            }
 
-            
+                if (GetAsyncKeyState(0x79)) // F10 for at forbinde sig til at devices.
+                {
+                    foreach (var device in deviceList)
+                    {
+                        if (device.Authenticated)
+                        {
+                            localClient.SetPin("1234");
+                            localClient.BeginConnect(device.DeviceAddress, BluetoothService.SerialPort, new AsyncCallback(Connect), device);
+                        }
+                    }
+                }
 
+
+
+            }   
         }
 
 
@@ -164,10 +159,8 @@ namespace ProjectGreenEnvironment
             {
 
                 // Only consider Bluetooth network interfaces
-                if (nic.NetworkInterfaceType != NetworkInterfaceType.FastEthernetFx &&
-                    nic.NetworkInterfaceType != NetworkInterfaceType.Wireless80211)
+                if (nic.Name.Contains("Bluetooth"))
                 {
-
                     return nic.GetPhysicalAddress();
                 }
             }
