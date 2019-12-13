@@ -21,7 +21,7 @@ namespace ProjectGreenEnvironment
 
             btnSave.Click += (s, e) => 
             {
-                NameRecieved?.Invoke(txtPeerName.Text, EventArgs.Empty);
+                NameRecieved?.Invoke(txtPeerName.Text.Replace(" ", "_"), EventArgs.Empty);
                 this.Close();
             };
         }

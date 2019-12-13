@@ -54,6 +54,9 @@ namespace ProjectGreenEnvironment
             Data = Data.Substring(SenderName.Length + 1, Data.Length - (SenderName.Length + 1));
             Data = Data.Replace("$END", string.Empty);
 
+            var aes = new StandardAES();
+            Data = aes.DecryptString(Data);
+
             using (var sw = new StreamWriter(TranslateFile($"{SenderName}.txt")))
             {
                 sw.Write(Data);
@@ -69,6 +72,9 @@ namespace ProjectGreenEnvironment
             {
                 Content = sr.ReadToEnd();
             }
+
+            var aes = new StandardAES();
+            Content = aes.EncryptToString(Content);
 
             // Construct file
             return $"{PeerName} {Content}$END"; 

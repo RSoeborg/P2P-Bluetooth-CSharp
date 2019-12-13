@@ -74,6 +74,7 @@
     <Compile Include="GreenEnvironment.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StandardAES.cs" />
     <EmbeddedResource Include="FrmSetup.resx">
       <DependentUpon>FrmSetup.cs</DependentUpon>
     </EmbeddedResource>
