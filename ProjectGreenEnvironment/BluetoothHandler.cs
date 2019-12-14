@@ -12,7 +12,7 @@ using System.Windows.Forms;
 
 namespace ProjectGreenEnvironment
 {
-    class BluetoothHandler
+    public class BluetoothHandler
     {
         private readonly string Device_Pin;
 
@@ -29,6 +29,7 @@ namespace ProjectGreenEnvironment
         
         public event EventHandler DiscoverComplete;
         public event EventHandler AcceptedConnection;
+        public event EventHandler DiscoverProgress;
         public event EventHandler ConnectedTo;
 
         public event EventHandler RecievedData;
@@ -38,11 +39,13 @@ namespace ProjectGreenEnvironment
             // log and save all found devices
             for (int i = 0; i < e.Devices.Length; i++)
             {
-                if (e.Devices[i].Remembered && e.Devices[i].Authenticated)
+                if (e.Devices[i].Remembered)
                 {
                     deviceList.Add(e.Devices[i]);
                 }
             }
+
+            DiscoverProgress?.Invoke(e.Devices, EventArgs.Empty);
         }
         private void component_DiscoverDevicesComplete(object sender, DiscoverDevicesEventArgs e)
         {
@@ -132,7 +135,7 @@ namespace ProjectGreenEnvironment
         {
             deviceList.Clear();
             BluetoothComponent localComponent = new BluetoothComponent(localClient);
-            localComponent.DiscoverDevicesAsync(10, true, true, false, true, null);
+            localComponent.DiscoverDevicesAsync(255, true, true, true, true, null);
             localComponent.DiscoverDevicesProgress += new EventHandler<DiscoverDevicesEventArgs>(component_DiscoverDevicesProgress);
             localComponent.DiscoverDevicesComplete += new EventHandler<DiscoverDevicesEventArgs>(component_DiscoverDevicesComplete);
         }
@@ -183,7 +186,7 @@ namespace ProjectGreenEnvironment
         {
             // Create listener
             BluetoothListener listener = new BluetoothListener(GetBluetoothAddress(), BluetoothService.SerialPort);
-            listener.SetPin(GetBluetoothAddress(), Device_Pin);
+            //listener.SetPin(GetBluetoothAddress(), Device_Pin);
             listener.Start(10);
             listener.BeginAcceptBluetoothClient(new AsyncCallback(AcceptConnection), listener);
         }
@@ -195,6 +198,7 @@ namespace ProjectGreenEnvironment
             
             BluetoothEndPoint localEndpoint = new BluetoothEndPoint(BluetoothAddress.Parse(GetBTMacAddress().ToString()), BluetoothService.SerialPort);
             var c = new BluetoothClient(localEndpoint);
+            c.Authenticate = true;
             //c.SetPin(overridePin == string.Empty ? Device_Pin : overridePin);
             c.BeginConnect(device.DeviceAddress, BluetoothService.SerialPort, new AsyncCallback(Connect), new BluetoothConnectedData() { SocketClient = c, Device = device });
         }
