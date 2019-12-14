@@ -14,7 +14,7 @@ using InTheHand.Net.Bluetooth;
 
 namespace ProjectGreenEnvironment
 {
-    class GreenEnvironment
+    public class GreenEnvironment
     {
         public string PeerName { get; private set; }
         
@@ -47,23 +47,23 @@ namespace ProjectGreenEnvironment
         {
             return Path.Combine(GetFolderPath(), file);
         }
-        
+         
         public void SaveFileData(string Data)
         { 
             var SenderName = Data.Split(' ').First();
             Data = Data.Substring(SenderName.Length + 1, Data.Length - (SenderName.Length + 1));
             Data = Data.Replace("$END", string.Empty);
 
-            //var aes = new StandardAES();
-            //Data = aes.DecryptString(Data);
+            if (SenderName.ToLower().Contains(PeerName.ToLower()))
+            {
+                return;//skip myself.
+            }
 
             using (var sw = new StreamWriter(TranslateFile($"{SenderName}.txt")))
             {
                 sw.Write(Data);
             }      
         }
-
-
         public string MyFile()
         {
             // Read my file
@@ -73,11 +73,37 @@ namespace ProjectGreenEnvironment
                 Content = sr.ReadToEnd();
             }
 
-            //var aes = new StandardAES();
-            //Content = aes.EncryptToString(Content);
-
             // Construct file
             return $"{PeerName} {Content}$END"; 
         }
+
+        public string[] AllFiles()
+        {
+
+            List<string> filesOut = new List<string>();
+            var files = Directory.GetFiles(GetFolderPath());
+            foreach (var file in files)
+            {
+                if (!file.Contains("env.txt"))
+                {
+                    filesOut.Add(ReadFile(file));
+                }
+            }
+            return filesOut.ToArray();
+        }
+
+        public string ReadFile(string path)
+        {
+            // Read my file
+            string Content = string.Empty;
+            using (var sr = new StreamReader(path))
+            {
+                Content = sr.ReadToEnd();
+            }
+
+            // Construct file
+            return $"{PeerName} {Content}$END";
+        }
+
     }
 }

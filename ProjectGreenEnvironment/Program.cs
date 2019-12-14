@@ -17,9 +17,6 @@ namespace ProjectGreenEnvironment
 {
     static class Program
     {
-        [DllImport("user32.dll")]
-        public static extern bool GetAsyncKeyState(int vKey);
-
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
@@ -50,10 +47,8 @@ namespace ProjectGreenEnvironment
             BluetoothHandler bluetooth = new BluetoothHandler("8724");
 
             // Open setup dialog
-            var connectDialog = new FrmConnect(bluetooth);
+            var connectDialog = new FrmConnect(bluetooth, environment);
             connectDialog.ShowDialog();
-
-
         }
 
         

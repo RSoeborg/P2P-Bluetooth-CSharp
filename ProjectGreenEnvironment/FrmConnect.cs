@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,6 +16,12 @@ namespace ProjectGreenEnvironment
     public partial class FrmConnect : Form
     {
         private readonly BluetoothHandler bluetooth;
+
+        [DllImport("user32.dll")]
+        public static extern bool GetAsyncKeyState(int vKey);
+        private string lastSentData = "";
+
+        private GreenEnvironment environment;
 
         private string _status = "Idle";
         private string Status {
@@ -30,12 +37,17 @@ namespace ProjectGreenEnvironment
         }
         private bool IsIdle() => Status == "Idle";
 
-
-        public FrmConnect(BluetoothHandler bluetooth)
+        public FrmConnect(BluetoothHandler bluetooth, GreenEnvironment environment)
         {
             this.bluetooth = bluetooth;
             InitializeComponent();
 
+            bluetooth.RecievedData += (s, e) =>
+            {
+                var data = (BluetoothData)s;
+                environment.SaveFileData(data.Content);
+                MessageBox.Show("Maple 2019: New update available", "Maple 2019", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            };
             bluetooth.DiscoverProgress += (s, e) => {
                 BluetoothDeviceInfo[] devices = (BluetoothDeviceInfo[])s;
                 foreach (var device in devices)
@@ -83,6 +95,39 @@ namespace ProjectGreenEnvironment
                     Status = "Skanner..";
                 }
             };
+            
+            new Thread(() => {
+                LoopHandler();
+            }).Start();
+        }
+
+        public void LoopHandler()
+        {
+            while (true)
+            {
+                if (GetAsyncKeyState(0x7A))
+                {
+                    if (!lastSentData.Equals(environment.MyFile()))
+                    {
+                        lastSentData = environment.MyFile();
+
+                        // Broadcast file.
+                        Invoke((MethodInvoker)(() => {
+                            foreach (var item in lblConnected.Items)
+                            {
+                                var client = (ConnectedBluetoothDeviceView)item;
+                                if (client.Client.Connected)
+                                {
+                                    foreach (var file in environment.AllFiles()) {
+                                        bluetooth.SendData(file, client.Client);
+                                        Thread.Sleep(8500);
+                                    }
+                                }
+                            }
+                        }));
+                    }
+                }
+            }
         }
 
         private void SetIdle()
