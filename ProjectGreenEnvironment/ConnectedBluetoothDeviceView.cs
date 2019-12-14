@@ -24,7 +24,15 @@ namespace ProjectGreenEnvironment
         {
             var ConnectedStr = Client.Connected ? "Forbundet" : "Ej forbundet";
             var Auth = Client.Authenticate ? "Auth" : "Ikke Auth";
-            return $"{Client.RemoteMachineName} - [{ConnectedStr}] [{Auth}]";
+
+            if (!Client.Connected)
+            {
+                return $"{Client.RemoteMachineName} - [{ConnectedStr}] [{Auth}]";
+            } else
+            {
+                if (Device == null) return $"Ukendt Person";
+                return $"{Device.DeviceName} - [{ConnectedStr}] [{Auth}]"; ;
+            }
         }
     }
 }
