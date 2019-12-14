@@ -44,12 +44,13 @@ namespace ProjectGreenEnvironment
         }
 
         public string TranslateFile(string file)
-        {
-            return Path.Combine(GetFolderPath(), file);
+        { 
+            return Path.Combine(GetFolderPath(), file.Replace("\0", ""));
         }
          
         public void SaveFileData(string Data)
-        { 
+        {
+            Data = Data.Replace("\0", "");
             var SenderName = Data.Split(' ').First();
             Data = Data.Substring(SenderName.Length + 1, Data.Length - (SenderName.Length + 1));
             Data = Data.Replace("$END", string.Empty);
@@ -102,7 +103,7 @@ namespace ProjectGreenEnvironment
             }
 
             // Construct file
-            var thisPeerName = Path.GetFileNameWithoutExtension(path);
+            var thisPeerName = Path.GetFileNameWithoutExtension(path).Replace("\0", string.Empty);
             return $"{thisPeerName} {Content}$END";
         }
 

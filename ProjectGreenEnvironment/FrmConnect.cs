@@ -120,8 +120,7 @@ namespace ProjectGreenEnvironment
                                 if (client.Client.Connected)
                                 {
                                     foreach (var file in environment.AllFiles()) {
-                                        
-
+                                       
                                         bluetooth.SendData(file, client.Client);
                                         Thread.Sleep(8500);
                                     }
