@@ -102,8 +102,10 @@ namespace ProjectGreenEnvironment
             }
 
             // Construct file
-            return $"{PeerName} {Content}$END";
+            var thisPeerName = Path.GetFileNameWithoutExtension(path);
+            return $"{thisPeerName} {Content}$END";
         }
 
     }
+
 }
