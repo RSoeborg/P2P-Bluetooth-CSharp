@@ -25,7 +25,7 @@ namespace ProjectGreenEnvironment
             var ConnectedStr = Client.Connected ? "Forbundet" : "Ej forbundet";
             var Auth = Client.Authenticate ? "Auth" : "Ikke Auth";
 
-            if (!Client.Connected)
+            if (Client.Connected)
             {
                 return $"{Client.RemoteMachineName} - [{ConnectedStr}] [{Auth}]";
             } else

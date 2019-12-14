@@ -20,7 +20,7 @@ namespace ProjectGreenEnvironment
         {
             var ConnectedStr = Device.Connected ? "Forbundet" : "Ej forbundet";
             var Authenticated = Device.Authenticated ? "Bonded" : "Ikke bonded";
-
+            
             return $"{Device.DeviceName} [{ConnectedStr}] [{Authenticated}]";
         }
 
