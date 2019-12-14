@@ -54,7 +54,7 @@ namespace ProjectGreenEnvironment
                 }).Start();
 
                 Invoke((MethodInvoker)(() => {
-                    lblConnected.Items.Add(new ConnectedBluetoothDeviceView() { Client = device });
+                    lblListening.Items.Add(new ConnectedBluetoothDeviceView() { Client = device });
                 }));
             }; 
             bluetooth.StartListener();
