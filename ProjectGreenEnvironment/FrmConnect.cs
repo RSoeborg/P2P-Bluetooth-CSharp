@@ -40,6 +40,7 @@ namespace ProjectGreenEnvironment
         public FrmConnect(BluetoothHandler bluetooth, GreenEnvironment environment)
         {
             this.bluetooth = bluetooth;
+            this.environment = environment;
             InitializeComponent();
 
             bluetooth.RecievedData += (s, e) =>
