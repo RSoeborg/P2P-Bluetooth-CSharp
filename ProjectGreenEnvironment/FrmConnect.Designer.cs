@@ -37,6 +37,7 @@
             this.label3 = new System.Windows.Forms.Label();
             this.lblListening = new System.Windows.Forms.ListBox();
             this.lblStatus = new System.Windows.Forms.Label();
+            this.btnHide = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // lblScanResults
@@ -120,11 +121,21 @@
             this.lblStatus.TabIndex = 9;
             this.lblStatus.Text = "Status: Idle";
             // 
+            // btnHide
+            // 
+            this.btnHide.Location = new System.Drawing.Point(15, 386);
+            this.btnHide.Name = "btnHide";
+            this.btnHide.Size = new System.Drawing.Size(338, 23);
+            this.btnHide.TabIndex = 10;
+            this.btnHide.Text = "Klar";
+            this.btnHide.UseVisualStyleBackColor = true;
+            // 
             // FrmConnect
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(729, 450);
+            this.Controls.Add(this.btnHide);
             this.Controls.Add(this.lblStatus);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.lblListening);
@@ -152,5 +163,6 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.ListBox lblListening;
         private System.Windows.Forms.Label lblStatus;
+        private System.Windows.Forms.Button btnHide;
     }
 }

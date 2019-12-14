@@ -48,7 +48,7 @@ namespace ProjectGreenEnvironment
 
             // Open setup dialog
             var connectDialog = new FrmConnect(bluetooth, environment);
-            connectDialog.ShowDialog();
+            Application.Run(connectDialog);
         }
 
         

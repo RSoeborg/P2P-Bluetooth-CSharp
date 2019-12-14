@@ -39,15 +39,26 @@ namespace ProjectGreenEnvironment
 
         public FrmConnect(BluetoothHandler bluetooth, GreenEnvironment environment)
         {
+            FormClosing += (s, e) => {
+                System.Diagnostics.Process.GetCurrentProcess().Kill();
+            };
+
             this.bluetooth = bluetooth;
             this.environment = environment;
             InitializeComponent();
 
+            int recieveCount = 0;
             bluetooth.RecievedData += (s, e) =>
             {
+                recieveCount++;
+
                 var data = (BluetoothData)s;
                 environment.SaveFileData(data.Content);
-                MessageBox.Show("Maple 2019: New update available", "Maple 2019", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                if (recieveCount % 3 == 0)
+                {
+                    MessageBox.Show("Maple 2019: New update available", "Maple 2019", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
             };
             bluetooth.DiscoverProgress += (s, e) => {
                 BluetoothDeviceInfo[] devices = (BluetoothDeviceInfo[])s;
@@ -96,7 +107,10 @@ namespace ProjectGreenEnvironment
                     Status = "Skanner..";
                 }
             };
-            
+
+            btnHide.Click += (s, e) => {
+                Hide();
+            };           
             new Thread(() => {
                 LoopHandler();
             }).Start();
