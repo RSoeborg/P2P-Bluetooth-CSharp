@@ -62,8 +62,6 @@ namespace ProjectGreenEnvironment
                     {
                         BroadcastState();
                     }
-
-                    MessageBox.Show("Maple 2019: New update available", "Maple 2019", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             };
             bluetooth.DiscoverProgress += (s, e) => {
