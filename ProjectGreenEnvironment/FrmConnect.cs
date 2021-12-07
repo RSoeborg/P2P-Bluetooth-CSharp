@@ -119,7 +119,7 @@ namespace ProjectGreenEnvironment
 
         public void LoopHandler()
         {
-            var watcher = new FileSystemWatcher(@"C:\Users\hkt\Desktop\GreenEnvironment");
+            var watcher = new FileSystemWatcher(GreenEnvironment.GetFolderPath());
 
             watcher.NotifyFilter =
                                   NotifyFilters.Size;

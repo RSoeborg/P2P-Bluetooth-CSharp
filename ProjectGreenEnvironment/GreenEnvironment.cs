@@ -18,7 +18,7 @@ namespace ProjectGreenEnvironment
     {
         public string PeerName { get; private set; }
         
-        public string GetFolderPath()
+        public static string GetFolderPath()
         {
             return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "GreenEnvironment");
         }

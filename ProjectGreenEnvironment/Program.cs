@@ -28,7 +28,7 @@ namespace ProjectGreenEnvironment
 
             // Check if setup has been completed
             var environment = new GreenEnvironment();
-            if (!Directory.Exists(environment.GetFolderPath()))
+            if (!Directory.Exists(GreenEnvironment.GetFolderPath()))
             {
                 FrmSetup setup = new FrmSetup();
 
