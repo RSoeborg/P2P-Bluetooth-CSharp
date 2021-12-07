@@ -56,8 +56,13 @@ namespace ProjectGreenEnvironment
                 var data = (BluetoothData)s;
                 environment.SaveFileData(data.Content);
 
-                if (recieveCount % 3 == 0)
+                if (recieveCount % int.Parse(txtPeersCount.Text) == 0)
                 {
+                    if (!cbMaster.Checked)
+                    {
+                        BroadcastState();
+                    }
+
                     MessageBox.Show("Maple 2019: New update available", "Maple 2019", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             };
@@ -119,28 +124,19 @@ namespace ProjectGreenEnvironment
 
         public void LoopHandler()
         {
-            var watcher = new FileSystemWatcher(GreenEnvironment.GetFolderPath());
-
-            watcher.NotifyFilter =
-                                  NotifyFilters.Size;
-
-            watcher.Changed += OnChanged;
-
-
-            watcher.Filter = "*.txt";
-            watcher.IncludeSubdirectories = true;
-            watcher.EnableRaisingEvents = true;
-
-            Console.WriteLine("Press enter to exit.");
-            Console.ReadLine();
-        }
-        private void OnChanged(object sender, FileSystemEventArgs e)
-        {
-            if (e.ChangeType != WatcherChangeTypes.Changed)
+            while (true)
             {
-                return;
+                Thread.Sleep(60 * 1000);
+                if (cbMaster.Checked)
+                {
+                    BroadcastState();
+                }
             }
 
+        }
+
+        private void BroadcastState()
+        {
             // Broadcast file.
             Invoke((MethodInvoker)(() =>
             {
@@ -159,6 +155,7 @@ namespace ProjectGreenEnvironment
                 }
             }));
         }
+        
         private void SetIdle()
         {
             Status = "Idle";
