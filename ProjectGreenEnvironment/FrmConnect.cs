@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -118,34 +119,50 @@ namespace ProjectGreenEnvironment
 
         public void LoopHandler()
         {
-            while (true)
-            {
-                if (GetAsyncKeyState(0x7A))
-                {
-                    if (!lastSentData.Equals(environment.MyFile()))
-                    {
-                        lastSentData = environment.MyFile();
+            var watcher = new FileSystemWatcher(@"C:\Users\hkt\Desktop\GreenEnvironment");
 
-                        // Broadcast file.
-                        Invoke((MethodInvoker)(() => {
-                            foreach (var item in lblConnected.Items)
-                            {
-                                var client = (ConnectedBluetoothDeviceView)item;
-                                if (client.Client.Connected)
-                                {
-                                    foreach (var file in environment.AllFiles()) {
-                                       
-                                        bluetooth.SendData(file, client.Client);
-                                        Thread.Sleep(8500);
-                                    }
-                                }
-                            }
-                        }));
+            watcher.NotifyFilter = NotifyFilters.Attributes
+                                 | NotifyFilters.CreationTime
+                                 | NotifyFilters.DirectoryName
+                                 | NotifyFilters.FileName
+                                 | NotifyFilters.LastAccess
+                                 | NotifyFilters.LastWrite
+                                 | NotifyFilters.Security
+                                 | NotifyFilters.Size;
+
+            watcher.Changed += OnChanged;
+
+
+            watcher.Filter = "*.txt";
+            watcher.IncludeSubdirectories = true;
+            watcher.EnableRaisingEvents = true;
+
+            Console.WriteLine("Press enter to exit.");
+            Console.ReadLine();
+        }
+        private void OnChanged(object sender, FileSystemEventArgs e)
+        {
+            if (e.ChangeType != WatcherChangeTypes.Changed)
+            {
+                return;
+            }
+            // Broadcast file.
+            Invoke((MethodInvoker)(() => {
+                foreach (var item in lblConnected.Items)
+                {
+                    var client = (ConnectedBluetoothDeviceView)item;
+                    if (client.Client.Connected)
+                    {
+                        foreach (var file in environment.AllFiles())
+                        {
+
+                            bluetooth.SendData(file, client.Client);
+                            Thread.Sleep(8500);
+                        }
                     }
                 }
-            }
+            }));
         }
-
         private void SetIdle()
         {
             Status = "Idle";
