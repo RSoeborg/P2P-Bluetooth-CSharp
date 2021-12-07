@@ -121,14 +121,8 @@ namespace ProjectGreenEnvironment
         {
             var watcher = new FileSystemWatcher(@"C:\Users\hkt\Desktop\GreenEnvironment");
 
-            watcher.NotifyFilter = NotifyFilters.Attributes
-                                 | NotifyFilters.CreationTime
-                                 | NotifyFilters.DirectoryName
-                                 | NotifyFilters.FileName
-                                 | NotifyFilters.LastAccess
-                                 | NotifyFilters.LastWrite
-                                 | NotifyFilters.Security
-                                 | NotifyFilters.Size;
+            watcher.NotifyFilter =
+                                  NotifyFilters.Size;
 
             watcher.Changed += OnChanged;
 
@@ -146,8 +140,10 @@ namespace ProjectGreenEnvironment
             {
                 return;
             }
+
             // Broadcast file.
-            Invoke((MethodInvoker)(() => {
+            Invoke((MethodInvoker)(() =>
+            {
                 foreach (var item in lblConnected.Items)
                 {
                     var client = (ConnectedBluetoothDeviceView)item;
