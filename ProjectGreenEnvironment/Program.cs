@@ -139,6 +139,7 @@ namespace ProjectGreenEnvironment
                 {
                     Console.WriteLine("Attempting reconnect");
                     bluetooth.RetryListening();
+                    lastReceived = DateTime.Now;
                 }
 
                 if (count <= 500) continue; // 1200
