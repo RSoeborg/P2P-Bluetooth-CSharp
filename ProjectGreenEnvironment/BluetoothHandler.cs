@@ -61,11 +61,11 @@ namespace ProjectGreenEnvironment
         }
         private void AcceptConnection(IAsyncResult result)
         {
-            if (result.IsCompleted)
-            {
-                BluetoothClient remoteDevice = ((BluetoothListener)result.AsyncState).EndAcceptBluetoothClient(result);
-                AcceptedConnection.Invoke(remoteDevice, EventArgs.Empty);
-            }
+            Console.WriteLine("something happened with accepting connection!");
+
+            if (!result.IsCompleted) return;
+            BluetoothClient remoteDevice = ((BluetoothListener)result.AsyncState).EndAcceptBluetoothClient(result);
+            AcceptedConnection.Invoke(remoteDevice, EventArgs.Empty);
         }
         
         public void StartListeningTo(BluetoothClient client, int delay=50)

@@ -63,7 +63,7 @@ namespace ProjectGreenEnvironment
                     attemptingConnectionsTo.Add(btView.Device);
 
                     Console.WriteLine("Connecting to ... " + btView.Device.DeviceName);
-                    bluetooth.BeginConnect(btView.Device);
+                    bluetooth.BeginConnect(btView.Device, "8724");
                 }
             };
 
