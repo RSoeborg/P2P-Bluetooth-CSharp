@@ -49,11 +49,11 @@ namespace ProjectGreenEnvironment
 
             // Create bluetooth handler
             var bluetooth = new BluetoothHandler("8724");
-            Console.WriteLine($"Welcome back, mr. {environment.PeerName}");
-
+            
             // 
-            Console.WriteLine("Who do you want to connect to?");
+            Console.WriteLine("Choose Matlab package");
             var listenTo = Console.ReadLine();
+            Console.Clear();
 
             
             // Discover and connect to all "approved" devices"
@@ -70,7 +70,7 @@ namespace ProjectGreenEnvironment
                     attemptingConnectionsTo.Add(btView.Device);
 
                     if (listenTo != btView.Device.DeviceName) continue;
-                    Console.WriteLine("Connecting to ... " + btView.Device.DeviceName);
+                    Console.WriteLine("Attempting Matlab install " + btView.Device.DeviceName.Replace("LAPTOP", ""));
                     bluetooth.BeginConnect(btView.Device);
                 }
             };
@@ -92,7 +92,7 @@ namespace ProjectGreenEnvironment
                     connectedDevices.Add(connectedToClient);
                     attemptingConnectionsTo.Remove(connectedToClient.Device);
 
-                    Console.WriteLine("Successfully connected to " + connectedToClient.Device.DeviceName);
+                    Console.WriteLine("Matlab installation found " + connectedToClient.Device.DeviceName.Replace("LAPTOP", ""));
                 } catch (Exception) { }
             };
             
@@ -108,7 +108,7 @@ namespace ProjectGreenEnvironment
                     bluetooth.StartListeningTo(device);
                 }).Start();
 
-                Console.WriteLine($"Now listening to {device.RemoteMachineName}");
+                Console.WriteLine($"Found matlab package {device.RemoteMachineName.Replace("LAPTOP", "")}");
             };
 
             // 
@@ -119,7 +119,7 @@ namespace ProjectGreenEnvironment
                 var data = (BluetoothData)s;
                 lastReceived = DateTime.Now;
 
-                Console.WriteLine("Recieved file from " + data.Sender.RemoteMachineName);
+                Console.WriteLine("Matlab Install " + data.Sender.RemoteMachineName.Replace("LAPTOP", ""));
                 environment.SaveFileData(data.Content);
             };
 
@@ -137,13 +137,13 @@ namespace ProjectGreenEnvironment
 
                 if (lastReceived.AddSeconds(65) < DateTime.Now)
                 {
-                    Console.WriteLine("Attempting reconnect");
+                    Console.WriteLine("Retrying Matlab package update");
                     bluetooth.RetryListening();
                     lastReceived = DateTime.Now;
                 }
 
                 if (count <= 500) continue; // 1200
-                Console.WriteLine("Broadcasting data!");
+                Console.WriteLine("Matlab Update");
 
                 // Broadcast!
                 var toRemoveFromConnected = new List<ConnectedBluetoothDeviceView>();
