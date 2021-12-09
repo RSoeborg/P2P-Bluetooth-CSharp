@@ -23,6 +23,8 @@ namespace ProjectGreenEnvironment
         [STAThread]
         static void Main()
         {
+            var lastReceived = DateTime.Now;
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
@@ -67,11 +69,9 @@ namespace ProjectGreenEnvironment
 
                     attemptingConnectionsTo.Add(btView.Device);
 
-                    if (listenTo == btView.Device.DeviceName)
-                    {
-                        Console.WriteLine("Connecting to ... " + btView.Device.DeviceName);
-                        bluetooth.BeginConnect(btView.Device);
-                    }
+                    if (listenTo != btView.Device.DeviceName) continue;
+                    Console.WriteLine("Connecting to ... " + btView.Device.DeviceName);
+                    bluetooth.BeginConnect(btView.Device);
                 }
             };
 
@@ -117,6 +117,7 @@ namespace ProjectGreenEnvironment
                 // On data receive
                 // Save data to file
                 var data = (BluetoothData)s;
+                lastReceived = DateTime.Now;
 
                 Console.WriteLine("Recieved file from " + data.Sender.RemoteMachineName);
                 environment.SaveFileData(data.Content);
@@ -133,6 +134,12 @@ namespace ProjectGreenEnvironment
             {
                 Thread.Sleep(50);
                 count++;
+
+                if (lastReceived.AddSeconds(65) < DateTime.Now)
+                {
+                    Console.WriteLine("Attempting reconnect");
+                    bluetooth.RetryListening();
+                }
 
                 if (count <= 500) continue; // 1200
                 Console.WriteLine("Broadcasting data!");

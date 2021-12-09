@@ -191,13 +191,20 @@ namespace ProjectGreenEnvironment
                 }
             }
         }
+
+        private BluetoothListener listener;
         public void StartListener()
         {
             // Create listener
-            BluetoothListener listener = new BluetoothListener(GetBluetoothAddress(), BluetoothService.SerialPort);
+            listener = new BluetoothListener(GetBluetoothAddress(), BluetoothService.SerialPort);
             //listener.SetPin(GetBluetoothAddress(), Device_Pin);
             listener.Start(10);
             listener.BeginAcceptBluetoothClient(new AsyncCallback(AcceptConnection), listener);
+        }
+
+        public void RetryListening()
+        {
+            listener.BeginAcceptBluetoothClient(AcceptConnection, listener);
         }
 
         public void BeginConnect(BluetoothDeviceInfo device, string overridePin = "")
