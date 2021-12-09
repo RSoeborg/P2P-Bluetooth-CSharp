@@ -61,8 +61,6 @@ namespace ProjectGreenEnvironment
         }
         private void AcceptConnection(IAsyncResult result)
         {
-            Console.WriteLine("something happened with accepting connection!");
-
             if (!result.IsCompleted) return;
             BluetoothClient remoteDevice = ((BluetoothListener)result.AsyncState).EndAcceptBluetoothClient(result);
             AcceptedConnection.Invoke(remoteDevice, EventArgs.Empty);
