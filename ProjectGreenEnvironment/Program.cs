@@ -48,6 +48,11 @@ namespace ProjectGreenEnvironment
             // Create bluetooth handler
             var bluetooth = new BluetoothHandler("8724");
             Console.WriteLine($"Welcome back, mr. {environment.PeerName}");
+
+            // 
+            Console.WriteLine("Who do you want to connect to?");
+            var listenTo = Console.ReadLine();
+
             
             // Discover and connect to all "approved" devices"
             bluetooth.DiscoverProgress += (s, e) => {
@@ -63,7 +68,8 @@ namespace ProjectGreenEnvironment
                     attemptingConnectionsTo.Add(btView.Device);
 
                     Console.WriteLine("Connecting to ... " + btView.Device.DeviceName);
-                    bluetooth.BeginConnect(btView.Device, "8724");
+                    if (listenTo == btView.ToString())
+                        bluetooth.BeginConnect(btView.Device, "8724");
                 }
             };
 
