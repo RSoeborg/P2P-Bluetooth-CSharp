@@ -126,24 +126,33 @@ namespace ProjectGreenEnvironment
                 Thread.Sleep(50);
                 count++;
 
-                if (count <= 1200) continue;
+                if (count <= 500) continue; // 1200
                 Console.WriteLine("Broadcasting data!");
-                Broadcast(environment, bluetooth, connectedDevices.Select(device => device.Client).ToList());
+
+                // Broadcast!
+                var toRemoveFromConnected = new List<ConnectedBluetoothDeviceView>();
+                foreach (var connectedDevice in connectedDevices)
+                {
+                    foreach (var file in environment.AllFiles())
+                    {
+                        if (connectedDevice.Client.Connected)
+                        {
+                            bluetooth.SendData(file, connectedDevice.Client);
+                            Thread.Sleep(8500);
+                        }
+                        else
+                        {
+                            toRemoveFromConnected.Add(connectedDevice);
+                        }
+                    }
+                }
+
+                foreach (var connectedBluetoothDeviceView in toRemoveFromConnected)
+                    connectedDevices.Remove(connectedBluetoothDeviceView);
+                
                 count = 0;
             }
         }
-
-        private static void Broadcast(GreenEnvironment environment, BluetoothHandler bluetooth, List<BluetoothClient> clients)
-        {
-            foreach (var client in clients)
-            {
-                foreach (var file in environment.AllFiles())
-                {
-                    bluetooth.SendData(file, client);
-                    Thread.Sleep(8500);
-                }
-            }
-   
-        }
+        
     }
 }
