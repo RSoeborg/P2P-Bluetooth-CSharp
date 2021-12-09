@@ -67,7 +67,7 @@ namespace ProjectGreenEnvironment
 
                     attemptingConnectionsTo.Add(btView.Device);
 
-                    if (listenTo == btView.ToString())
+                    if (listenTo == btView.Device.DeviceName)
                     {
                         Console.WriteLine("Connecting to ... " + btView.Device.DeviceName);
                         bluetooth.BeginConnect(btView.Device);
