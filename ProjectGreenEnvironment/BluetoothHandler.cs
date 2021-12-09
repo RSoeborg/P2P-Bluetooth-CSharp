@@ -196,11 +196,10 @@ namespace ProjectGreenEnvironment
             if (!device.Authenticated) 
                 throw new Exception("Tried to connect to a device that is not authenticated."); 
             
-            BluetoothEndPoint localEndpoint = new BluetoothEndPoint(BluetoothAddress.Parse(GetBTMacAddress().ToString()), BluetoothService.SerialPort);
-            var c = new BluetoothClient(localEndpoint);
-            c.Authenticate = true;
+            var localEndpoint = new BluetoothEndPoint(BluetoothAddress.Parse(GetBTMacAddress().ToString()), BluetoothService.SerialPort);
+            var c = new BluetoothClient(localEndpoint) {Authenticate = true};
             //c.SetPin(overridePin == string.Empty ? Device_Pin : overridePin);
-            c.BeginConnect(device.DeviceAddress, BluetoothService.SerialPort, new AsyncCallback(Connect), new BluetoothConnectedData() { SocketClient = c, Device = device });
+            c.BeginConnect(device.DeviceAddress, BluetoothService.SerialPort, Connect,new BluetoothConnectedData() { SocketClient = c, Device = device });
         }
 
         public BluetoothAddress GetBluetoothAddress()

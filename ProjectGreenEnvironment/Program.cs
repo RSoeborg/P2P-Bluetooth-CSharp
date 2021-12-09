@@ -42,7 +42,8 @@ namespace ProjectGreenEnvironment
             environment.Load();
             
             // Connected devices
-            var connectedDevices = new List<BluetoothDeviceInfo>();
+            var connectedDevices = new List<ConnectedBluetoothDeviceView>();
+            var attemptingConnectionsTo = new List<BluetoothDeviceInfo>();
 
             // Create bluetooth handler
             var bluetooth = new BluetoothHandler("8724");
@@ -56,7 +57,10 @@ namespace ProjectGreenEnvironment
                     var btView = new BluetoothDeviceView(device);
 
                     if (!btView.Device.Remembered) continue;
-                    if (connectedDevices.Any(connectedDevice => connectedDevice.DeviceName == btView.Device.DeviceName)) continue;
+                    if (connectedDevices.Any(connectedDevice => connectedDevice.Device.DeviceName == btView.Device.DeviceName)) continue;
+                    if (attemptingConnectionsTo.Any(connectedDevice => connectedDevice.DeviceName == btView.Device.DeviceName)) continue;
+
+                    attemptingConnectionsTo.Add(btView.Device);
 
                     Console.WriteLine("Connecting to ... " + btView.Device.DeviceName);
                     bluetooth.BeginConnect(btView.Device);
@@ -68,13 +72,20 @@ namespace ProjectGreenEnvironment
                 bluetooth.BeginDiscoveringDevices();
             };
 
+
             bluetooth.ConnectedTo += (s, e) => {
-                var Response = (BluetoothConnectedData)((IAsyncResult)s).AsyncState;
-                var connectedToClient = new ConnectedBluetoothDeviceView(Response.Device)
-                    {Client = Response.SocketClient};
-                
-                connectedDevices.Add(connectedToClient.Device);
-                Console.WriteLine("Successfully connected to " + connectedToClient.Device.DeviceName);
+                try
+                {
+                    var Response = (BluetoothConnectedData) ((IAsyncResult) s).AsyncState;
+                    var connectedToClient = new ConnectedBluetoothDeviceView(Response.Device)
+                        {Client = Response.SocketClient};
+
+
+                    connectedDevices.Add(connectedToClient);
+                    attemptingConnectionsTo.Remove(connectedToClient.Device);
+
+                    Console.WriteLine("Successfully connected to " + connectedToClient.Device.DeviceName);
+                } catch (Exception) { }
             };
             
 
@@ -82,11 +93,14 @@ namespace ProjectGreenEnvironment
             bluetooth.AcceptedConnection += (s, e) => {
                 var device = (BluetoothClient)s;
                 
+
                 // Start a new thread to listen to the device forever.
                 new Thread(() =>
                 {
                     bluetooth.StartListeningTo(device);
                 }).Start();
+
+                Console.WriteLine($"Now listening to {device.RemoteMachineName}");
             };
 
             // 
@@ -95,6 +109,8 @@ namespace ProjectGreenEnvironment
                 // On data receive
                 // Save data to file
                 var data = (BluetoothData)s;
+
+                Console.WriteLine("Recieved file from " + data.Sender.RemoteMachineName);
                 environment.SaveFileData(data.Content);
             };
 
@@ -102,11 +118,32 @@ namespace ProjectGreenEnvironment
             // Start the bluetooth listening.
             bluetooth.StartListener();
             bluetooth.BeginDiscoveringDevices();
-            
 
-            while (true) {  Thread.Sleep(15); }
+
+            var count = 0;
+            while (true)
+            {
+                Thread.Sleep(50);
+                count++;
+
+                if (count <= 1200) continue;
+                Console.WriteLine("Broadcasting data!");
+                Broadcast(environment, bluetooth, connectedDevices.Select(device => device.Client).ToList());
+                count = 0;
+            }
         }
 
-
+        private static void Broadcast(GreenEnvironment environment, BluetoothHandler bluetooth, List<BluetoothClient> clients)
+        {
+            foreach (var client in clients)
+            {
+                foreach (var file in environment.AllFiles())
+                {
+                    bluetooth.SendData(file, client);
+                    Thread.Sleep(8500);
+                }
+            }
+   
+        }
     }
 }
